@@ -1,0 +1,5 @@
+steps:
+  - name: maven:3-jdk-11
+    entrypoint: mvn
+    args: ['deploy']
+logsBucket: 'gs://ssdc-rm-ci-cloud-build-logging'
