@@ -20,6 +20,6 @@ class InSetRuleTest {
     InSetRule underTest = new InSetRule(new String[] {"foo", "bar"});
     Optional<String> validity = underTest.checkValidity("baz");
     assertThat(validity.isPresent()).isTrue();
-    assertThat(validity.get()).isEqualTo("Not in set of foo, bar");
+    assertThat(validity.get()).startsWith("Not in set of");
   }
 }
