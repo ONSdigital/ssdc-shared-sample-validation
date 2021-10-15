@@ -15,6 +15,13 @@ public class ISODateTimeRuleTest {
   }
 
   @Test
+  void checkValidityValidNoZ() {
+    ISODateTimeRule underTest = new ISODateTimeRule();
+    Optional<String> validity = underTest.checkValidity("2021-10-09T12:00+00");
+    assertThat(validity.isPresent()).isFalse();
+  }
+
+  @Test
   void checkValidityInvalid() {
     ISODateTimeRule underTest = new ISODateTimeRule();
     Optional<String> validity = underTest.checkValidity("66-66-6666:66:66:66.666Z");
