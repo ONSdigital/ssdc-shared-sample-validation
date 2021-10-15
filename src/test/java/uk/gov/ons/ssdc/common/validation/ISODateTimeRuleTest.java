@@ -4,20 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class ISODateTimeRuleTest {
 
-  @Test
-  void checkValidityValid() {
+  @ParameterizedTest
+  @ValueSource(strings = {"2021-10-09T15:45:33.123Z", "2021-10-09T12:00+00"})
+  void checkValidityValid(String dateTime) {
     ISODateTimeRule underTest = new ISODateTimeRule();
-    Optional<String> validity = underTest.checkValidity("2021-10-09T15:45:33.123Z");
-    assertThat(validity.isPresent()).isFalse();
-  }
-
-  @Test
-  void checkValidityValidNoZ() {
-    ISODateTimeRule underTest = new ISODateTimeRule();
-    Optional<String> validity = underTest.checkValidity("2021-10-09T12:00+00");
+    Optional<String> validity = underTest.checkValidity(dateTime);
     assertThat(validity.isPresent()).isFalse();
   }
 
