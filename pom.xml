@@ -23,18 +23,18 @@
   <distributionManagement>
     <snapshotRepository>
       <id>artifact-registry</id>
-      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-bracehcc/hughs-snapshots</url>
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-bracehcc/hugh-repository</url>
     </snapshotRepository>
     <repository>
       <id>artifact-registry</id>
-      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-bracehcc/hughs-snapshots</url>
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-bracehcc/hugh-repository</url>
     </repository>
   </distributionManagement>
 
   <repositories>
     <repository>
       <id>artifact-registry</id>
-      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-bracehcc/hughs-snapshots</url>
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-bracehcc/hugh-repository</url>
       <releases>
         <enabled>true</enabled>
       </releases>
