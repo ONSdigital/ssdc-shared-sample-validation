@@ -63,4 +63,8 @@ public class ColumnValidator implements Serializable {
   public boolean isSensitive() {
     return sensitive;
   }
+
+  public Rule[] getRules() {
+    return rules;
+  }
 }
