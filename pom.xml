@@ -22,12 +22,12 @@
 
   <distributionManagement>
     <snapshotRepository>
-      <id>artifact-registry</id>
+      <id>artifact-registry-snapshots</id>
       <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-ci/rm-snapshots</url>
     </snapshotRepository>
     <repository>
-      <id>artifact-registry</id>
-      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-ci/rm-snapshots</url>
+      <id>artifact-registry-releases</id>
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ons-ci-rm/rm-releases</url>
     </repository>
   </distributionManagement>
 
@@ -36,10 +36,20 @@
       <id>artifact-registry</id>
       <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-ci/rm-snapshots</url>
       <releases>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
       </releases>
       <snapshots>
         <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>artifact-registry-prod</id>
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ons-ci-rm/rm-releases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>
