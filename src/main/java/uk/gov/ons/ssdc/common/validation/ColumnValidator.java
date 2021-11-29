@@ -56,6 +56,31 @@ public class ColumnValidator implements Serializable {
     return Optional.empty();
   }
 
+  public Optional<String> validateRowWithDateExcludedErrorMsgs(Map<String, String> rowData) {
+    List<String> validationErrors = new LinkedList<>();
+
+    for (Rule rule : rules) {
+      String dataToValidate = rowData.get(columnName);
+
+      Optional<String> validationError = rule.checkValidity(dataToValidate);
+      if (validationError.isPresent()) {
+        validationErrors.add(
+            "Column '"
+                + columnName
+                + " Failed validation for Rule '"
+                + rule.getClass().getSimpleName()
+                + "' validation error: "
+                + validationError.get());
+      }
+    }
+
+    if (validationErrors.size() > 0) {
+      return Optional.of(String.join(", ", validationErrors));
+    }
+
+    return Optional.empty();
+  }
+
   public String getColumnName() {
     return columnName;
   }
