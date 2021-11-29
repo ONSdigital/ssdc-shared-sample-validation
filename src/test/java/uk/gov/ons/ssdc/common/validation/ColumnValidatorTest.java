@@ -42,7 +42,7 @@ class ColumnValidatorTest {
 
     Map<String, String> dataRow = Map.of("col1", "foo");
     Optional<String> actualValidationResult =
-        underTest.validateRowWithDateExcludedErrorMsgs(dataRow);
+        underTest.validateRowWithDataExcludedErrorMsgs(dataRow);
 
     assertThat(actualValidationResult).isEmpty();
   }
@@ -54,7 +54,7 @@ class ColumnValidatorTest {
 
     Map<String, String> dataRow = Map.of("col1", "bar");
     Optional<String> actualValidationResult =
-        underTest.validateRowWithDateExcludedErrorMsgs(dataRow);
+        underTest.validateRowWithDataExcludedErrorMsgs(dataRow);
 
     assertThat(actualValidationResult).isPresent();
     assertThat(actualValidationResult.get()).isEqualTo(ERROR_MSG_EXCLUDING_DATA);

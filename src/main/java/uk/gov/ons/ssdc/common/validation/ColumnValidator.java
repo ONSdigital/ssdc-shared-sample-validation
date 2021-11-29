@@ -56,7 +56,7 @@ public class ColumnValidator implements Serializable {
     return Optional.empty();
   }
 
-  public Optional<String> validateRowWithDateExcludedErrorMsgs(Map<String, String> rowData) {
+  public Optional<String> validateRowWithDataExcludedErrorMsgs(Map<String, String> rowData) {
     List<String> validationErrors = new LinkedList<>();
 
     for (Rule rule : rules) {
