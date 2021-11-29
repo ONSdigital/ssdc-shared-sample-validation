@@ -67,7 +67,7 @@ public class ColumnValidator implements Serializable {
         validationErrors.add(
             "Column '"
                 + columnName
-                + " Failed validation for Rule '"
+                + "' Failed validation for Rule '"
                 + rule.getClass().getSimpleName()
                 + "' validation error: "
                 + validationError.get());

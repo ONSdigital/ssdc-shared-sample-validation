@@ -10,7 +10,7 @@ class ColumnValidatorTest {
   private static final String ERROR_MSG_INCLUDING_DATA =
       "Column 'col1' value 'bar' validation error: Not in set of foo";
   private static final String ERROR_MSG_EXCLUDING_DATA =
-      "Column 'col1 Failed validation for Rule 'InSetRule' validation error: Not in set of foo";
+      "Column 'col1' Failed validation for Rule 'InSetRule' validation error: Not in set of foo";
 
   @Test
   public void validateRowSuccess() {
