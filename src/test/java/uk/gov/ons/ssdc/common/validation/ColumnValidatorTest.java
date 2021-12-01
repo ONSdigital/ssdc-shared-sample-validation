@@ -41,8 +41,7 @@ class ColumnValidatorTest {
     ColumnValidator underTest = new ColumnValidator("col1", false, new Rule[] {inSetRule});
 
     Map<String, String> dataRow = Map.of("col1", "foo");
-    Optional<String> actualValidationResult =
-        underTest.validateRowWithDataExcludedErrorMsgs(dataRow);
+    Optional<String> actualValidationResult = underTest.validateRow(dataRow, true);
 
     assertThat(actualValidationResult).isEmpty();
   }
@@ -53,8 +52,7 @@ class ColumnValidatorTest {
     ColumnValidator underTest = new ColumnValidator("col1", false, new Rule[] {inSetRule});
 
     Map<String, String> dataRow = Map.of("col1", "bar");
-    Optional<String> actualValidationResult =
-        underTest.validateRowWithDataExcludedErrorMsgs(dataRow);
+    Optional<String> actualValidationResult = underTest.validateRow(dataRow, true);
 
     assertThat(actualValidationResult).isPresent();
     assertThat(actualValidationResult.get()).isEqualTo(ERROR_MSG_EXCLUDING_DATA);

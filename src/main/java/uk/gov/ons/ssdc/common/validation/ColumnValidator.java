@@ -32,45 +32,38 @@ public class ColumnValidator implements Serializable {
   }
 
   public Optional<String> validateRow(Map<String, String> rowData) {
-    List<String> validationErrors = new LinkedList<>();
-
-    for (Rule rule : rules) {
-      String dataToValidate = rowData.get(columnName);
-
-      Optional<String> validationError = rule.checkValidity(dataToValidate);
-      if (validationError.isPresent()) {
-        validationErrors.add(
-            "Column '"
-                + columnName
-                + "' value '"
-                + dataToValidate
-                + "' validation error: "
-                + validationError.get());
-      }
-    }
-
-    if (validationErrors.size() > 0) {
-      return Optional.of(String.join(", ", validationErrors));
-    }
-
-    return Optional.empty();
+    return validateData(rowData.get(columnName), false);
   }
 
-  public Optional<String> validateRowWithDataExcludedErrorMsgs(Map<String, String> rowData) {
+  public Optional<String> validateRow(
+      Map<String, String> rowData, boolean excludeDataFromReturnedErrorMsgs) {
+    return validateData(rowData.get(columnName), excludeDataFromReturnedErrorMsgs);
+  }
+
+  public Optional<String> validateData(
+      String dataToValidate, boolean excludeDataFromReturnedErrorMsgs) {
     List<String> validationErrors = new LinkedList<>();
 
     for (Rule rule : rules) {
-      String dataToValidate = rowData.get(columnName);
-
       Optional<String> validationError = rule.checkValidity(dataToValidate);
       if (validationError.isPresent()) {
-        validationErrors.add(
-            "Column '"
-                + columnName
-                + "' Failed validation for Rule '"
-                + rule.getClass().getSimpleName()
-                + "' validation error: "
-                + validationError.get());
+        if (excludeDataFromReturnedErrorMsgs) {
+          validationErrors.add(
+              "Column '"
+                  + columnName
+                  + "' Failed validation for Rule '"
+                  + rule.getClass().getSimpleName()
+                  + "' validation error: "
+                  + validationError.get());
+        } else {
+          validationErrors.add(
+              "Column '"
+                  + columnName
+                  + "' value '"
+                  + dataToValidate
+                  + "' validation error: "
+                  + validationError.get());
+        }
       }
     }
 
