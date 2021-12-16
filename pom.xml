@@ -6,7 +6,7 @@
 
   <groupId>uk.gov.ons.ssdc</groupId>
   <artifactId>ssdc-shared-sample-validation</artifactId>
-  <version>1.4.1-SNAPSHOT</version>
+  <version>1.4.2-SNAPSHOT</version>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -18,7 +18,7 @@
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <log4j2.version>2.15.0</log4j2.version>
+    <log4j2.version>2.16.0</log4j2.version>
   </properties>
 
   <distributionManagement>
