@@ -10,5 +10,8 @@ format:
 format-check:
 	mvn fmt:check
 
+check:
+	mvn fmt:check pmd:check
+
 test:
 	mvn clean verify

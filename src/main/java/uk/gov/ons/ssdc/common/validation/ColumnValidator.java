@@ -67,7 +67,7 @@ public class ColumnValidator implements Serializable {
       }
     }
 
-    if (validationErrors.size() > 0) {
+    if (!validationErrors.isEmpty()) {
       return Optional.of(String.join(", ", validationErrors));
     }
 
