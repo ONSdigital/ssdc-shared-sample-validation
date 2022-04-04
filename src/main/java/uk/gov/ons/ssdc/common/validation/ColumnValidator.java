@@ -28,7 +28,7 @@ public class ColumnValidator implements Serializable {
       @JsonProperty("rules") Rule[] rules) {
     this.columnName = columnName;
     this.sensitive = sensitive;
-    this.rules = rules;
+    this.rules = rules.clone();
   }
 
   public Optional<String> validateRow(Map<String, String> rowData) {
@@ -83,6 +83,6 @@ public class ColumnValidator implements Serializable {
   }
 
   public Rule[] getRules() {
-    return rules;
+    return rules.clone();
   }
 }
