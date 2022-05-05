@@ -1,8 +1,8 @@
 package uk.gov.ons.ssdc.common.validation;
 
 import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,84 +10,79 @@ public class EmailRuleTest {
 
   EmailRule underTest = new EmailRule();
 
+/* correct and incorrect email addresses from:
+https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/tests/test_recipient_validation.py#L101
+ */
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+             "email@domain.com",
+             "email@domain.COM",
+             "firstname.lastname@domain.com",
+             "firstname.o\'lastname@domain.com",
+             "email@subdomain.domain.com",
+             "firstname+lastname@domain.com",
+             "1234567890@domain.com",
+             "email@domain-one.com",
+             "_______@domain.com",
+             "email@domain.name",
+             "email@domain.superlongtld",
+             "email@domain.co.jp",
+             "firstname-lastname@domain.com",
+             "info@german-financial-services.vermögensberatung",
+             "info@german-financial-services.reallylongarbitrarytldthatiswaytoohugejustincase",
+             "japanese-info@例え.テスト",
+             "email@double--hyphen.com"
+      })
+  void testValidateEmailAddressValid(String emailAddress) {
+    assertThat(underTest.checkValidity(emailAddress)).isEmpty();
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+          strings = {
+                 "email@123.123.123.123",
+                 "email@[123.123.123.123]",
+                 "plainaddress",
+                 "@no-local-part.com",
+                 "Outlook Contact <outlook-contact@domain.com>",
+                 "no-at.domain.com",
+                 "no-tld@domain",
+                 ";beginning-semicolon@domain.co.uk",
+                 "middle-semicolon@domain.co;uk",
+                 "trailing-semicolon@domain.com;",
+                 "\"email+leading-quotes@domain.com",
+                 "email+middle\"-quotes@domain.com",
+                 "\"quoted-local-part\"@domain.com",
+                 "\"quoted@domain.com\"",
+                 "lots-of-dots@domain..gov..uk",
+                 "two-dots..in-local@domain.com",
+                 "multiple@domains@domain.com",
+                 "spaces in local@domain.com",
+                 "spaces-in-domain@dom ain.com",
+                 "underscores-in-domain@dom_ain.com",
+                 "pipe-in-domain@example.com|gov.uk",
+                 "comma,in-local@gov.uk",
+                 "comma-in-domain@domain,gov.uk",
+                 "pound-sign-in-local£@domain.com",
+                 "local-with-’-apostrophe@domain.com",
+                 "local-with-”-quotes@domain.com",
+                 "domain-starts-with-a-dot@.domain.com",
+                 "brackets(in)local@domain.com",
+                 "incorrect-punycode@xn---something.com",
+          })
+  void testValidateEmailAddressInvalid(String emailAddress) {
+    assertThat(underTest.checkValidity(emailAddress)).isNotEmpty();
+  }
+
+
+  //separate java test for this as different test/formatting syntax from Python
   @Test
-  public void testAll() {
-    executeAll("joe.bloggs@gms.com", "Good email address", true);
-    executeAll("joe.bloggs@ gms.com", "email address with whitespace after", false);
-    executeAll("fed @domain.com", "email address with whitespace before @", false);
-    executeAll("joe.bloggs@gms.com.", "email address ending with period", false);
-    executeAll("joe\\bloggs@gms.com", "doesn't allow back slashes", false);
+  void testLongEmailAddress() {
+    String tooLongEmail = "email-too-long-" + "a".repeat(320) + "@example.com";
+    assertThat(underTest.checkValidity(tooLongEmail)).isNotEmpty();
   }
 
-  private void executeAll(String email, String message, boolean expectedEmpty) {
-    //    if (underTest.eqCopied(email).isEmpty() == expectedEmpty) {
-    ////      System.out.println("EQ passed: " + message + " for email: [" + email + "]");
-    //    } else {
-    //      System.out.println("EQ FAILED: " + message + " for email: [" + email + "]");
-    //    }
-    //
-    //    if (underTest.baeldungRegex(email).isEmpty() == expectedEmpty) {
-    ////      System.out.println("BD passed: " + message + " for email: [" + email + "]");
-    //    } else {
-    //      System.out.println("BD FAILED: " + message + " for email: [" + email + "]");
-    //    }
 
-    if (underTest.RHRegex(email).isEmpty() == expectedEmpty) {
-      System.out.println("RH passed: " + message + " for email: [" + email + "]");
-    } else {
-      System.out.println("RH FAILED: " + message + " for email: [" + email + "]");
-    }
-  }
-
-  //
-  //  @Test
-  //  public void simpleEmailTestBD() {
-  //    assertThat(underTest.baeldungRegex("joe.bloggs@somewhere.gov.uk")).as("should be a good
-  // email").isEmpty();
-  //  }
-  //
-  @Test
-  public void allowWhiteSpaceBD() {
-    assertThat(underTest.baeldungRegex("fed @domain.com"))
-        .as("Allowed whitespace in email addresss")
-        .isNotEmpty();
-  }
-
-  @Test
-  public void simpleEmailTestEQ() {
-    assertThat(underTest.eqCopied("joe.bloggs@somewhere.gov.uk")).isEmpty();
-  }
-  //
-  //    @Test
-  //    public void allowWhiteSpaceEQ() {
-  //      assertThat(underTest.checkValidity("fed @domain.com"))
-  //              .as("Allowed whitespace in email addresss")
-  //              .isNotEmpty();
-  //    }
-  //
-  //  @Test
-  //  public void testEmailEndingWithPeriodEQ() {
-  //    assertThat(underTest.checkValidity("fed@domain.com."))
-  //        .as("Allowed email to end with .")
-  //        .isNotEmpty();
-  //  }
-  //
-  //  @Test
-  //  public void multipleAmpersandsEQ() {
-  //    assertThat(underTest.checkValidity("A@b@c@domain.com"))
-  //        .as("Allowed multiple ampersand")
-  //        .isNotEmpty();
-  //  }
-  //
-  //  @Test void testStartingWithPeriodEQ() {
-  //    assertThat(underTest.checkValidity(".fed@domain.com"))
-  //            .as("Allowed email to start with .")
-  //            .isNotEmpty();
-  //  }
-  //
-  //  @Test void testSingleDomainEQ() {
-  //    assertThat(underTest.checkValidity("fed@com"))
-  //            .as("Allowed single Domain")
-  //            .isNotEmpty();
-  //  }
 }

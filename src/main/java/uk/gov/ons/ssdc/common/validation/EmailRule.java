@@ -1,99 +1,98 @@
 package uk.gov.ons.ssdc.common.validation;
 
-
+import java.net.IDN;
 import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//public class EmailRule implements Rule {
-public class EmailRule {
+public class EmailRule implements Rule {
 
-  // Python email_regex = re.compile(r"^.+@([^.@][^@\s]+)$")  r means treat \ as not an escaped character.
-  private String basic_email_regex_from_eq = "^.+@([^.@][^@\s]+)$";
+  /* Regexes from
+    https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/__init__.py#L11
 
-//  Just one from here
-  private String fromBaeldung = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+  This turns into (by running in Python):
+  '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~\\-]+@([^.@][^@\\s]+)$'
 
-  private String rh_email_validation_pattern = "(^[^@\s]+@[^@\s]+\\.[^@\s]+$)";
+   This has the r prefix or character escaping  on the \
+   */
+  private static String EMAIL_REGEX = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~\\-]+@([^.@][^@\\s]+)$";
+  private static String TOP_LEVEL_DOMAIN_REGEX = "^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$";
+  private static String HOSTNAME_PART_REGEX = "^(xn|[a-z0-9]+)(-?-[a-z0-9]+)*$";
 
-//  @Override
-//  public Optional<String> checkValidity(String data) {
-//
-//    if(data.matches(basic_email_regex_from_eq)) {
-//      return Optional.empty();
-//    }
-//
-//      return Optional.of("Email didn't match regex");
-//  }
+  private static int MAX_EMAIL_LENGTH = 320;
+  public static final int MAX_HOSTNAME_LENGTH = 253;
+  public static final int MAX_PART_LENGTH = 63;
 
-  public Optional<String> eqCopied(String data) {
+  /*
+  The validation code is from
+  https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/recipients.py#L634
 
-    Pattern mypattern = Pattern.compile(basic_email_regex_from_eq);
-    Matcher mymatcher = mypattern.matcher(data);
+  Their comment:
+     almost exactly the same as by https://github.com/wtforms/wtforms/blob/master/wtforms/validators.py,
+     with minor tweaks for SES compatibility - to avoid complications we are a lot stricter with the local part
+     than neccessary - we don't allow any double quotes or semicolons to prevent SES Technical Failures
 
-  // doesn't split out groups like it does in Python.  So would have to do a split?
+  */
+  @Override
+  public Optional<String> checkValidity(String data) {
 
-//    Matcher mymatcher= mypattern.matcher(mystring);
-//
-//
-//    if(data.matches(basic_email_regex_from_eq)) {
-//
-//      Pattern mypattern = Pattern.compile(MYREGEX, Pattern.CASE_INSENSITIVE);
-//      Matcher mymatcher= mypattern.matcher(mystring);
-//      parts = hostname.split(".")
-//      if len(parts) > 1 and not tld_part_regex.match(parts[-1]):
-//      print("TLD error")
+    Pattern emailPattern = Pattern.compile(EMAIL_REGEX);
 
-//
-//      return Optional.empty();
-//    }
-
-    return Optional.of("Email didn't match regex");
-  }
-
-  public Optional<String> baeldungRegex(String data) {
-
-    if(data.matches(fromBaeldung)) {
-      return Optional.empty();
+    if (!emailPattern.matcher(data).matches()) {
+      return Optional.of("Email didn't match regex");
     }
 
-    return Optional.of("Email didn't match regex");
-  }
-
-  public Optional<String> RHRegex(String data) {
-
-    if(data.matches(rh_email_validation_pattern)) {
-      return Optional.empty();
+    if (data.length() > MAX_EMAIL_LENGTH) {
+      return Optional.of("Email longer than: " + MAX_EMAIL_LENGTH);
     }
 
-    return Optional.of("Email didn't match regex");
+    if (data.contains("..")) {
+      return Optional.of("Email contains consecutive periods");
+    }
+
+    String[] emailSplit = data.split("@");
+    if (emailSplit.length != 2) {
+      return Optional.of(
+          "Expected splitting email on @ to equal 2, instead equalled: " + emailSplit.length);
+    }
+
+    String hostName = emailSplit[1];
+
+    // idna = "Internationalized domain name" - this encode/decode cycle converts unicode into its accurate ascii
+    // representation as the web uses. '例え.テスト'.encode('idna') == b'xn--r8jz45g.xn--zckzah'
+    hostName = IDN.toASCII(hostName);
+
+    String[] parts = hostName.split("\\.");
+
+    if (hostName.length() > MAX_HOSTNAME_LENGTH) {
+      return Optional.of("Email hostname longer than: " + MAX_HOSTNAME_LENGTH);
+    }
+
+    if (parts.length < 2) {
+      return Optional.of("Email hostname parts less than 2");
+    }
+
+    Pattern hostNamePartPattern = Pattern.compile(HOSTNAME_PART_REGEX, Pattern.CASE_INSENSITIVE);
+
+    for (String part : parts) {
+      if (part == null) {
+        return Optional.of("part of hostname null");
+      }
+
+      if (part.length() > MAX_PART_LENGTH) {
+        return Optional.of("Email part longer than: " + MAX_PART_LENGTH);
+      }
+
+      if (!hostNamePartPattern.matcher(part).matches()) {
+        return Optional.of("part of hostname does not match REGEX");
+      }
+    }
+
+    Pattern tldPattern = Pattern.compile(TOP_LEVEL_DOMAIN_REGEX, Pattern.CASE_INSENSITIVE);
+
+    if (!tldPattern.matcher(parts[parts.length - 1]).matches()) {
+      return Optional.of("Email didn't match regex");
+    }
+
+    return Optional.empty();
   }
-
-//  not email_validation_pattern.fullmatch(str(data.get('email'))):
-//          if display_region == 'cy':
-//  flash(request, WEBFORM_MISSING_EMAIL_INVALID_MSG_CY)
-//            else:
-//  flash(request, WEBFORM_MISSING_EMAIL_INVALID_MSG)
-
-
 }
-
-//tld_part_regex = re.compile( r"^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$", re.IGNORECASE )
-//        email_regex = re.compile(r"^.+@([^.@][^@\s]+)$")
-
-
-//
-//class EmailTLDCheck:
-//        def __init__(self, message: Optional[str] = None):
-//        self.message = message or error_messages["INVALID_EMAIL_FORMAT"]
-//
-//        def __call__(self, form: "QuestionnaireForm", field: StringField) -> None:
-//        if match := email_regex.match(field.data):
-//        hostname = match.group(1)
-//        try:
-//        hostname = hostname.encode("idna").decode("ascii")
-//        except UnicodeError as exc:
-//        raise validators.StopValidation(self.message) from exc
-//        parts = hostname.split(".")
-//        if len(parts) > 1 and not tld_part_regex.match(parts[-1]):
-//        raise validators.StopValidation(self.message)
