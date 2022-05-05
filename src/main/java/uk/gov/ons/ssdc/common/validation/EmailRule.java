@@ -9,16 +9,13 @@ public class EmailRule implements Rule {
   /* Regexes from
     https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/__init__.py#L11
 
-  This turns into (by running in Python):
-  '^[a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~\\-]+@([^.@][^@\\s]+)$'
-
-   This has the r prefix or character escaping  on the \
+    I ran part of the original Python Code locally to get a better idea around the r escape char - and copied them over.
    */
-  private static String EMAIL_REGEX = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~\\-]+@([^.@][^@\\s]+)$";
-  private static String TOP_LEVEL_DOMAIN_REGEX = "^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$";
-  private static String HOSTNAME_PART_REGEX = "^(xn|[a-z0-9]+)(-?-[a-z0-9]+)*$";
+  private static final String EMAIL_REGEX = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~\\-]+@([^.@][^@\\s]+)$";
+  private static final String TOP_LEVEL_DOMAIN_REGEX = "^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$";
+  private static final String HOSTNAME_PART_REGEX = "^(xn|[a-z0-9]+)(-?-[a-z0-9]+)*$";
 
-  private static int MAX_EMAIL_LENGTH = 320;
+  private static final int MAX_EMAIL_LENGTH = 320;
   public static final int MAX_HOSTNAME_LENGTH = 253;
   public static final int MAX_PART_LENGTH = 63;
 
@@ -31,6 +28,9 @@ public class EmailRule implements Rule {
      with minor tweaks for SES compatibility - to avoid complications we are a lot stricter with the local part
      than neccessary - we don't allow any double quotes or semicolons to prevent SES Technical Failures
 
+    I have not implement the 1st line of:
+    email_address = strip_and_remove_obscure_whitespace(email_address)
+    This is because in validation we don't want to be fixing things and they (goc notify) handle it anyway
   */
   @Override
   public Optional<String> checkValidity(String data) {
