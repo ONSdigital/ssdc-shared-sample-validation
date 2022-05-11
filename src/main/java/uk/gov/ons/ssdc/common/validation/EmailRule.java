@@ -19,6 +19,10 @@ public class EmailRule implements Rule {
   public static final int MAX_HOSTNAME_LENGTH = 253;
   public static final int MAX_PART_LENGTH = 63;
 
+  private static final Pattern emailPattern = Pattern.compile(EMAIL_REGEX);
+  private static final Pattern hostNamePartPattern = Pattern.compile(HOSTNAME_PART_REGEX, Pattern.CASE_INSENSITIVE);
+  private static final Pattern tldPattern = Pattern.compile(TOP_LEVEL_DOMAIN_REGEX, Pattern.CASE_INSENSITIVE);
+
   /*
   The validation code is from
   https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/recipients.py#L634
@@ -34,8 +38,6 @@ public class EmailRule implements Rule {
   */
   @Override
   public Optional<String> checkValidity(String data) {
-
-    Pattern emailPattern = Pattern.compile(EMAIL_REGEX);
 
     if (!emailPattern.matcher(data).matches()) {
       return Optional.of("Email didn't match regex");
@@ -71,8 +73,6 @@ public class EmailRule implements Rule {
       return Optional.of("Email hostname parts less than 2");
     }
 
-    Pattern hostNamePartPattern = Pattern.compile(HOSTNAME_PART_REGEX, Pattern.CASE_INSENSITIVE);
-
     for (String part : parts) {
       if (part == null) {
         return Optional.of("part of hostname null");
@@ -86,8 +86,6 @@ public class EmailRule implements Rule {
         return Optional.of("part of hostname does not match REGEX");
       }
     }
-
-    Pattern tldPattern = Pattern.compile(TOP_LEVEL_DOMAIN_REGEX, Pattern.CASE_INSENSITIVE);
 
     if (!tldPattern.matcher(parts[parts.length - 1]).matches()) {
       return Optional.of("Email didn't match regex");
