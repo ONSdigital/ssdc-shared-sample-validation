@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 The validation code is from
 https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/recipients.py#L634
 
+This is to align our code with
+
 The code has been manually converted from Python to Java.  The related test email addresses are based on their email address
 tests too.
 
@@ -69,8 +71,7 @@ public class EmailRule implements Rule {
   representation as the web uses. '例え.テスト'.encode('idna') == b'xn--r8jz45g.xn--zckzah'
     */
   private String internationalizedDomainName(String hostName) {
-    hostName = IDN.toASCII(hostName);
-    return hostName;
+    return IDN.toASCII(hostName);
   }
 
   private Optional<String> checkBasicRegexLengthAndPeriods(String data) {
