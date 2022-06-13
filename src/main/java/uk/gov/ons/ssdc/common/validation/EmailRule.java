@@ -4,13 +4,25 @@ import java.net.IDN;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+/*
+The validation code is from
+https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/recipients.py#L634
+
+The code has been manually converted from Python to Java.  The related test email addresses are based on their email address
+tests too.
+
+Their comment:
+   almost exactly the same as by https://github.com/wtforms/wtforms/blob/master/wtforms/validators.py,
+   with minor tweaks for SES compatibility - to avoid complications we are a lot stricter with the local part
+   than neccessary - we don't allow any double quotes or semicolons to prevent SES Technical Failures
+
+
+*/
 public class EmailRule implements Rule {
 
   /* Regexes from
-    https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/__init__.py#L11
-
-    I ran part of the original Python Code locally to get a better idea around the r escape char - and copied them over.
-   */
+   https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/__init__.py#L11
+  */
   private static final String EMAIL_REGEX = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~\\-]+@([^.@][^@\\s]+)$";
   private static final String TOP_LEVEL_DOMAIN_REGEX = "^([a-z]{2,63}|xn--([a-z0-9]+-)*[a-z0-9]+)$";
   private static final String HOSTNAME_PART_REGEX = "^(xn|[a-z0-9]+)(-?-[a-z0-9]+)*$";
@@ -20,25 +32,48 @@ public class EmailRule implements Rule {
   public static final int MAX_PART_LENGTH = 63;
 
   private static final Pattern emailPattern = Pattern.compile(EMAIL_REGEX);
-  private static final Pattern hostNamePartPattern = Pattern.compile(HOSTNAME_PART_REGEX, Pattern.CASE_INSENSITIVE);
-  private static final Pattern tldPattern = Pattern.compile(TOP_LEVEL_DOMAIN_REGEX, Pattern.CASE_INSENSITIVE);
+  private static final Pattern hostNamePartPattern =
+      Pattern.compile(HOSTNAME_PART_REGEX, Pattern.CASE_INSENSITIVE);
+  private static final Pattern topLevelDomainPattern =
+      Pattern.compile(TOP_LEVEL_DOMAIN_REGEX, Pattern.CASE_INSENSITIVE);
 
-  /*
-  The validation code is from
-  https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/recipients.py#L634
-
-  Their comment:
-     almost exactly the same as by https://github.com/wtforms/wtforms/blob/master/wtforms/validators.py,
-     with minor tweaks for SES compatibility - to avoid complications we are a lot stricter with the local part
-     than neccessary - we don't allow any double quotes or semicolons to prevent SES Technical Failures
-
-    I have not implement the 1st line of:
-    email_address = strip_and_remove_obscure_whitespace(email_address)
-    This is because in validation we don't want to be fixing things and they (goc notify) handle it anyway
-  */
   @Override
   public Optional<String> checkValidity(String data) {
 
+    Optional<String> errorsOpt = checkBasicRegexLengthAndPeriods(data);
+    if (errorsOpt.isPresent()) {
+      return errorsOpt;
+    }
+
+    // Now split on @, check it's 2 long
+    String[] emailSplit = data.split("@");
+    if (emailSplit.length != 2) {
+      return Optional.of(
+          "Expected splitting email on @ to equal 2, instead equalled: " + emailSplit.length);
+    }
+
+    String hostName = internationalizedDomainName(emailSplit[1]);
+
+    // split the hostName which is everything after the @
+    String[] parts = hostName.split("\\.");
+
+    if (hostName.length() > MAX_HOSTNAME_LENGTH) {
+      return Optional.of("Email hostname longer than: " + MAX_HOSTNAME_LENGTH);
+    }
+
+    return checkPartsOfHostName(parts);
+  }
+
+  /*
+   idna = "Internationalized domain name" - this encode/decode cycle converts unicode into its accurate ascii
+  representation as the web uses. '例え.テスト'.encode('idna') == b'xn--r8jz45g.xn--zckzah'
+    */
+  private String internationalizedDomainName(String hostName) {
+    hostName = IDN.toASCII(hostName);
+    return hostName;
+  }
+
+  private Optional<String> checkBasicRegexLengthAndPeriods(String data) {
     if (!emailPattern.matcher(data).matches()) {
       return Optional.of("Email didn't match regex");
     }
@@ -51,28 +86,15 @@ public class EmailRule implements Rule {
       return Optional.of("Email contains consecutive periods");
     }
 
-    String[] emailSplit = data.split("@");
-    if (emailSplit.length != 2) {
-      return Optional.of(
-          "Expected splitting email on @ to equal 2, instead equalled: " + emailSplit.length);
-    }
+    return Optional.empty();
+  }
 
-    String hostName = emailSplit[1];
-
-    // idna = "Internationalized domain name" - this encode/decode cycle converts unicode into its accurate ascii
-    // representation as the web uses. '例え.テスト'.encode('idna') == b'xn--r8jz45g.xn--zckzah'
-    hostName = IDN.toASCII(hostName);
-
-    String[] parts = hostName.split("\\.");
-
-    if (hostName.length() > MAX_HOSTNAME_LENGTH) {
-      return Optional.of("Email hostname longer than: " + MAX_HOSTNAME_LENGTH);
-    }
-
+  private Optional<String> checkPartsOfHostName(String[] parts) {
     if (parts.length < 2) {
       return Optional.of("Email hostname parts less than 2");
     }
 
+    // loop over each part of the hostname checking it's length, and regex
     for (String part : parts) {
       if (part == null) {
         return Optional.of("part of hostname null");
@@ -87,7 +109,14 @@ public class EmailRule implements Rule {
       }
     }
 
-    if (!tldPattern.matcher(parts[parts.length - 1]).matches()) {
+    return checkTopLevelDomain(parts);
+  }
+
+  private Optional<String> checkTopLevelDomain(String[] parts) {
+    // Top Level Domain, or the last part of an emailAddress
+    String topLevelDomain = parts[parts.length - 1];
+
+    if (!topLevelDomainPattern.matcher(topLevelDomain).matches()) {
       return Optional.of("Email didn't match regex");
     }
 
