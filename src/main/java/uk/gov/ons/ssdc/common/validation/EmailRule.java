@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 The validation code is from
 https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/notifications_utils/recipients.py#L634
 
-This is to align our code with
+This is to align our code with the gov notify service as best as possible.
 
 The code has been manually converted from Python to Java.  The related test email addresses are based on their email address
 tests too.
