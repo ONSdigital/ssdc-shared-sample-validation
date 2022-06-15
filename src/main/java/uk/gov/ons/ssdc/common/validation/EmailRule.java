@@ -1,5 +1,6 @@
 package uk.gov.ons.ssdc.common.validation;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import java.net.IDN;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -20,6 +21,7 @@ Their comment:
 
 
 */
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class EmailRule implements Rule {
 
   /* Regexes from
