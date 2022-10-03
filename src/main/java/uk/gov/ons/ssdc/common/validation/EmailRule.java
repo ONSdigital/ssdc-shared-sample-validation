@@ -1,6 +1,10 @@
 package uk.gov.ons.ssdc.common.validation;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.NoArgsConstructor;
+
 import java.net.IDN;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -41,8 +45,21 @@ public class EmailRule implements Rule {
   private static final Pattern topLevelDomainPattern =
       Pattern.compile(TOP_LEVEL_DOMAIN_REGEX, Pattern.CASE_INSENSITIVE);
 
+  private boolean optional = false;
+
+
+  @JsonCreator
+  public EmailRule(@JsonProperty(value = "optional") boolean optional) {
+    this.optional = optional;
+  }
+
+
   @Override
   public Optional<String> checkValidity(String data) {
+
+    if (this.optional && data.isEmpty()) {
+      return Optional.empty();
+    }
 
     Optional<String> errorsOpt = checkBasicRegexLengthAndPeriods(data);
     if (errorsOpt.isPresent()) {

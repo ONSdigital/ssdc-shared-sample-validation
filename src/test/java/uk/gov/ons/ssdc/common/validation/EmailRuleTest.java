@@ -1,22 +1,26 @@
 package uk.gov.ons.ssdc.common.validation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-public class EmailRuleTest {
+import java.util.stream.Stream;
 
-  EmailRule underTest = new EmailRule();
+import static org.assertj.core.api.Assertions.assertThat;
+
+
+class EmailRuleTest {
+
+  EmailRule emailRule = new EmailRule(false);
+  EmailRule optionalEmailRule = new EmailRule(true);
 
   /* correct and incorrect email addresses from:
   https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/tests/test_recipient_validation.py#L101
    */
 
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
+  private static Stream<Arguments> validEmailProvider() {
+    return Stream.of(
         "email@domain.com",
         "email@domain.COM",
         "firstname.lastname@domain.com",
@@ -33,15 +37,11 @@ public class EmailRuleTest {
         "info@german-financial-services.vermögensberatung",
         "info@german-financial-services.reallylongarbitrarytldthatiswaytoohugejustincase",
         "japanese-info@例え.テスト",
-        "email@double--hyphen.com"
-      })
-  void testValidateEmailAddressValid(String emailAddress) {
-    assertThat(underTest.checkValidity(emailAddress)).isEmpty();
+        "email@double--hyphen.com").map(Arguments::of);
   }
 
-  @ParameterizedTest
-  @ValueSource(
-      strings = {
+  private static Stream<Arguments> invalidEmailProvider() {
+    return Stream.of(
         "email@123.123.123.123",
         "email@[123.123.123.123]",
         "plainaddress",
@@ -70,16 +70,50 @@ public class EmailRuleTest {
         "local-with-”-quotes@domain.com",
         "domain-starts-with-a-dot@.domain.com",
         "brackets(in)local@domain.com",
-        "incorrect-punycode@xn---something.com",
-      })
+        "incorrect-punycode@xn---something.com").map(Arguments::of);
+  }
+
+  ;
+
+  @ParameterizedTest
+  @MethodSource("validEmailProvider")
+  void testValidateEmailAddressValid(String emailAddress) {
+    assertThat(emailRule.checkValidity(emailAddress)).isEmpty();
+  }
+
+  @ParameterizedTest
+  @MethodSource("invalidEmailProvider")
   void testValidateEmailAddressInvalid(String emailAddress) {
-    assertThat(underTest.checkValidity(emailAddress)).isNotEmpty();
+    assertThat(emailRule.checkValidity(emailAddress)).isNotEmpty();
+  }
+
+  @Test
+  void testValidateEmailAddressEmptyInvalid() {
+    assertThat(emailRule.checkValidity("")).isNotEmpty();
+  }
+
+  @ParameterizedTest
+  @MethodSource("validEmailProvider")
+  void testValidateEmailAddressOptionalValid(String emailAddress) {
+    assertThat(optionalEmailRule.checkValidity(emailAddress)).isEmpty();
+  }
+
+  @ParameterizedTest
+  @MethodSource("invalidEmailProvider")
+  void testValidateEmailAddressesOptionalInvalid(String emailAddress) {
+    assertThat(optionalEmailRule.checkValidity(emailAddress)).isNotEmpty();
+  }
+
+
+  @Test
+  void testValidateEmailAddressOptionalEmptyValid() {
+    assertThat(optionalEmailRule.checkValidity("")).isEmpty();
   }
 
   // separate java test for this as different test/formatting syntax from Python
   @Test
   void testLongEmailAddress() {
     String tooLongEmail = "email-too-long-" + "a".repeat(320) + "@example.com";
-    assertThat(underTest.checkValidity(tooLongEmail)).isNotEmpty();
+    assertThat(emailRule.checkValidity(tooLongEmail)).isNotEmpty();
   }
 }
