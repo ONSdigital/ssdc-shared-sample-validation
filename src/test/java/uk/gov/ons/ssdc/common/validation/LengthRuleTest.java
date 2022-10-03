@@ -1,10 +1,9 @@
 package uk.gov.ons.ssdc.common.validation;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class LengthRuleTest {
 
