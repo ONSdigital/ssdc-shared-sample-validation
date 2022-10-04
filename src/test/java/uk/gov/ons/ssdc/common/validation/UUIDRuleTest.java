@@ -13,14 +13,13 @@ class UUIDRuleTest {
   void checkValidityValid() {
     UUIDRule underTest = new UUIDRule();
     Optional<String> validity = underTest.checkValidity(UUID.randomUUID().toString());
-    assertThat(validity.isPresent()).isFalse();
+    assertThat(validity).isNotPresent();
   }
 
   @Test
   void checkValidityInvalid() {
     UUIDRule underTest = new UUIDRule();
     Optional<String> validity = underTest.checkValidity("this clearly is not a UUID");
-    assertThat(validity.isPresent()).isTrue();
-    assertThat(validity.get()).isEqualTo("Not a valid UUID");
+    assertThat(validity).isPresent().contains("Not a valid UUID");
   }
 }

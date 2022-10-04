@@ -12,14 +12,13 @@ class MandatoryRuleTest {
   void checkValidityValid() {
     MandatoryRule underTest = new MandatoryRule();
     Optional<String> validity = underTest.checkValidity("foo");
-    assertThat(validity.isPresent()).isFalse();
+    assertThat(validity).isNotPresent();
   }
 
   @Test
   void checkValidityInvalid() {
     MandatoryRule underTest = new MandatoryRule();
     Optional<String> validity = underTest.checkValidity("");
-    assertThat(validity.isPresent()).isTrue();
-    assertThat(validity.get()).isEqualTo("Mandatory value missing");
+    assertThat(validity).isPresent().contains("Mandatory value missing");
   }
 }
