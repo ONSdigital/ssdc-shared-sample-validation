@@ -43,17 +43,17 @@ public class EmailRule implements Rule {
   private static final Pattern topLevelDomainPattern =
       Pattern.compile(TOP_LEVEL_DOMAIN_REGEX, Pattern.CASE_INSENSITIVE);
 
-  private boolean optional;
+  private final boolean mandatory;
 
   @JsonCreator
-  public EmailRule(@JsonProperty(value = "optional") boolean optional) {
-    this.optional = optional;
+  public EmailRule(@JsonProperty(value = "mandatory") boolean mandatory) {
+    this.mandatory = mandatory;
   }
 
   @Override
   public Optional<String> checkValidity(String data) {
 
-    if (this.optional && data.isEmpty()) {
+    if (!this.mandatory && data.isEmpty()) {
       return Optional.empty();
     }
 

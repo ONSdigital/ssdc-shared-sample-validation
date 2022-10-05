@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class EmailRuleTest {
 
   EmailRule emailRule = new EmailRule(false);
-  EmailRule optionalEmailRule = new EmailRule(true);
+  EmailRule mandatoryEmailRule = new EmailRule(true);
 
   /* correct and incorrect email addresses from:
   https://github.com/alphagov/notifications-utils/blob/7d48b8f825fafb0db0bad106ccccdd1f889cf657/tests/test_recipient_validation.py#L101
@@ -86,25 +86,25 @@ class EmailRuleTest {
   }
 
   @Test
-  void testValidateEmailAddressEmptyInvalid() {
-    assertThat(emailRule.checkValidity("")).isNotEmpty();
+  void testValidateEmailAddressEmptyValid() {
+    assertThat(emailRule.checkValidity("")).isEmpty();
   }
 
   @ParameterizedTest
   @MethodSource("validEmailProvider")
-  void testValidateEmailAddressOptionalValid(String emailAddress) {
-    assertThat(optionalEmailRule.checkValidity(emailAddress)).isEmpty();
+  void testValidateEmailAddressMandatoryValid(String emailAddress) {
+    assertThat(mandatoryEmailRule.checkValidity(emailAddress)).isEmpty();
   }
 
   @ParameterizedTest
   @MethodSource("invalidEmailProvider")
-  void testValidateEmailAddressesOptionalInvalid(String emailAddress) {
-    assertThat(optionalEmailRule.checkValidity(emailAddress)).isNotEmpty();
+  void testValidateEmailAddressesMandatoryInvalid(String emailAddress) {
+    assertThat(mandatoryEmailRule.checkValidity(emailAddress)).isNotEmpty();
   }
 
   @Test
-  void testValidateEmailAddressOptionalEmptyValid() {
-    assertThat(optionalEmailRule.checkValidity("")).isEmpty();
+  void testValidateEmailAddressMandatoryEmptyInvalid() {
+    assertThat(mandatoryEmailRule.checkValidity("")).isNotEmpty();
   }
 
   // separate java test for this as different test/formatting syntax from Python
