@@ -15,7 +15,7 @@ class RegexRuleTest {
         new RegexRule(TEST_REGEX_UK_MOBILE_NUMBER, TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
 
     Optional<String> actualResult = underTest.checkValidity("07123456789");
-    assertThat(actualResult.isPresent()).isFalse();
+    assertThat(actualResult).isNotPresent();
   }
 
   @Test
@@ -24,8 +24,7 @@ class RegexRuleTest {
         new RegexRule(TEST_REGEX_UK_MOBILE_NUMBER, TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
 
     Optional<String> actualResult = underTest.checkValidity("07123456xxx");
-    assertThat(actualResult.isPresent()).isTrue();
-    assertThat(actualResult.get()).isEqualTo(TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
+    assertThat(actualResult).isPresent().contains(TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
   }
 
   @Test
@@ -34,8 +33,7 @@ class RegexRuleTest {
         new RegexRule(TEST_REGEX_UK_MOBILE_NUMBER, TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
 
     Optional<String> actualResult = underTest.checkValidity("0712345");
-    assertThat(actualResult.isPresent()).isTrue();
-    assertThat(actualResult.get()).isEqualTo(TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
+    assertThat(actualResult).isPresent().contains(TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
   }
 
   @Test
@@ -44,7 +42,6 @@ class RegexRuleTest {
         new RegexRule(TEST_REGEX_UK_MOBILE_NUMBER, TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
 
     Optional<String> actualResult = underTest.checkValidity("07123456789123456789");
-    assertThat(actualResult.isPresent()).isTrue();
-    assertThat(actualResult.get()).isEqualTo(TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
+    assertThat(actualResult).isPresent().contains(TEST_REGEX_UK_MOBILE_NUMBER_ERROR);
   }
 }

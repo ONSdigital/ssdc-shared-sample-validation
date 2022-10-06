@@ -13,7 +13,7 @@ class ColumnValidatorTest {
       "Column 'col1' Failed validation for Rule 'InSetRule' validation error: Not in set of foo";
 
   @Test
-  public void validateRowSuccess() {
+  void validateRowSuccess() {
     InSetRule inSetRule = new InSetRule(new String[] {"foo", "bar"});
     ColumnValidator underTest = new ColumnValidator("col1", false, new Rule[] {inSetRule});
 
@@ -24,19 +24,18 @@ class ColumnValidatorTest {
   }
 
   @Test
-  public void validateRowError() {
+  void validateRowError() {
     InSetRule inSetRule = new InSetRule(new String[] {"foo"});
     ColumnValidator underTest = new ColumnValidator("col1", false, new Rule[] {inSetRule});
 
     Map<String, String> dataRow = Map.of("col1", "bar");
     Optional<String> actualValidationResult = underTest.validateRow(dataRow);
 
-    assertThat(actualValidationResult).isPresent();
-    assertThat(actualValidationResult.get()).isEqualTo(ERROR_MSG_INCLUDING_DATA);
+    assertThat(actualValidationResult).isPresent().contains(ERROR_MSG_INCLUDING_DATA);
   }
 
   @Test
-  public void validateRowWithDateExcludedErrorMsgsSuccess() {
+  void validateRowWithDateExcludedErrorMsgsSuccess() {
     InSetRule inSetRule = new InSetRule(new String[] {"foo", "bar"});
     ColumnValidator underTest = new ColumnValidator("col1", false, new Rule[] {inSetRule});
 
@@ -47,14 +46,13 @@ class ColumnValidatorTest {
   }
 
   @Test
-  public void validateRowWithDateExcludedErrorMsgsError() {
+  void validateRowWithDateExcludedErrorMsgsError() {
     InSetRule inSetRule = new InSetRule(new String[] {"foo"});
     ColumnValidator underTest = new ColumnValidator("col1", false, new Rule[] {inSetRule});
 
     Map<String, String> dataRow = Map.of("col1", "bar");
     Optional<String> actualValidationResult = underTest.validateRow(dataRow, true);
 
-    assertThat(actualValidationResult).isPresent();
-    assertThat(actualValidationResult.get()).isEqualTo(ERROR_MSG_EXCLUDING_DATA);
+    assertThat(actualValidationResult).isPresent().contains(ERROR_MSG_EXCLUDING_DATA);
   }
 }

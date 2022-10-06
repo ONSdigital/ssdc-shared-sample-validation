@@ -12,14 +12,14 @@ class InSetRuleTest {
   void checkValidityValid() {
     InSetRule underTest = new InSetRule(new String[] {"foo", "bar"});
     Optional<String> validity = underTest.checkValidity("foo");
-    assertThat(validity.isPresent()).isFalse();
+    assertThat(validity).isNotPresent();
   }
 
   @Test
   void checkValidityInvalid() {
     InSetRule underTest = new InSetRule(new String[] {"foo", "bar"});
     Optional<String> validity = underTest.checkValidity("baz");
-    assertThat(validity.isPresent()).isTrue();
+    assertThat(validity).isPresent();
     assertThat(validity.get()).startsWith("Not in set of");
   }
 }
