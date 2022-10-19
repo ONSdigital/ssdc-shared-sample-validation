@@ -23,11 +23,13 @@
   <distributionManagement>
     <snapshotRepository>
       <id>artifact-registry-snapshots</id>
-      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-ci/rm-snapshots</url>
+<!--      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-ci/rm-snapshots</url>-->
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-adamhawtin/test-snapshots</url>
     </snapshotRepository>
     <repository>
       <id>artifact-registry-releases</id>
-      <url>artifactregistry://europe-west2-maven.pkg.dev/ons-ci-rm/rm-releases</url>
+<!--      <url>artifactregistry://europe-west2-maven.pkg.dev/ons-ci-rm/rm-releases</url>-->
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ssdc-rm-adamhawtin/test-releases</url>
     </repository>
   </distributionManagement>
 
