@@ -1,6 +1,8 @@
 # Has the POM been updated?
+
 The [pom.xml](pom.xml) file `project.version` must be bumped appropriately on any code changes.
-- [] the POM has been updated with an appropriate version bump
+
+* [ ] the POM has been updated with an appropriate version bump if required
 
 # Motivation and Context
 <!--- Why is this change required? What problem does it solve? -->
