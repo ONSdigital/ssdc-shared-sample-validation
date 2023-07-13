@@ -8,6 +8,11 @@
       {
         "className": "uk.gov.ons.ssdc.common.validation.LengthRule",
         "maxLength": 60
+      },
+      {
+        "className": "uk.gov.ons.ssdc.common.validation.RegexRule",
+        "expression": "[ -~]*",
+        "userFriendlyError": "Address line 1 contains non-printable or non-ASCII characters"
       }
     ]
   },
@@ -17,6 +22,11 @@
       {
         "className": "uk.gov.ons.ssdc.common.validation.LengthRule",
         "maxLength": 60
+      },
+      {
+        "className": "uk.gov.ons.ssdc.common.validation.RegexRule",
+        "expression": "[ -~]*",
+        "userFriendlyError": "Address line 2 contains non-printable or non-ASCII characters"
       }
     ]
   },
@@ -26,6 +36,11 @@
       {
         "className": "uk.gov.ons.ssdc.common.validation.LengthRule",
         "maxLength": 60
+      },
+      {
+        "className": "uk.gov.ons.ssdc.common.validation.RegexRule",
+        "expression": "[ -~]*",
+        "userFriendlyError": "Address line 3 contains non-printable or non-ASCII characters"
       }
     ]
   },
@@ -34,6 +49,11 @@
     "rules": [
       {
         "className": "uk.gov.ons.ssdc.common.validation.MandatoryRule"
+      },
+      {
+        "className": "uk.gov.ons.ssdc.common.validation.RegexRule",
+        "expression": "[ -~]*",
+        "userFriendlyError": "Town name contains non-printable or non-ASCII characters"
       }
     ]
   },
@@ -42,6 +62,11 @@
     "rules": [
       {
         "className": "uk.gov.ons.ssdc.common.validation.MandatoryRule"
+      },
+      {
+        "className": "uk.gov.ons.ssdc.common.validation.RegexRule",
+        "expression": "[ -~]*",
+        "userFriendlyError": "Postcode contains non-printable or non-ASCII characters"
       }
     ]
   },
@@ -79,8 +104,8 @@
       },
       {
         "className": "uk.gov.ons.ssdc.common.validation.RegexRule",
-        "expression": "[ -~]",
-        "userFriendlyError": "Email contains non-ASCII characters"
+        "expression": "[ -~]*",
+        "userFriendlyError": "Email contains non-printable or non-ASCII characters"
       }
     ]
   }
