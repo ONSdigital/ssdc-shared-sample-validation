@@ -76,6 +76,11 @@
       {
         "className": "uk.gov.ons.ssdc.common.validation.EmailRule",
         "mandatory": true
+      },
+      {
+        "className": "uk.gov.ons.ssdc.common.validation.RegexRule",
+        "expression": "[ -~]",
+        "userFriendlyError": "Email contains non-ASCII characters"
       }
     ]
   }
