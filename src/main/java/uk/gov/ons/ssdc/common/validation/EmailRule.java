@@ -51,25 +51,30 @@ public class EmailRule implements Rule {
   }
 
   @Override
-  public Optional<String> checkValidity(String data) {
+  public Optional<String> checkValidity(String email) {
 
-    if (!this.mandatory && data.isEmpty()) {
+    if (!this.mandatory && email.isEmpty()) {
       return Optional.empty();
     }
 
-    Optional<String> errorsOpt = checkBasicRegexLengthAndPeriods(data);
+    Optional<String> errorsOpt = checkBasicRegexLengthAndPeriods(email);
     if (errorsOpt.isPresent()) {
       return errorsOpt;
     }
 
     // Now split on @, check it's 2 long
-    String[] emailSplit = data.split("@");
+    String[] emailSplit = email.split("@");
     if (emailSplit.length != 2) {
       return Optional.of(
           "Expected splitting email on @ to equal 2, instead equalled: " + emailSplit.length);
     }
 
-    String hostName = internationalizedDomainName(emailSplit[1]);
+    String hostName = emailSplit[1];
+    Optional<String> hostnameInAsciiOptional = internationalizedDomainName(hostName);
+    if (hostnameInAsciiOptional.isEmpty()) {
+      return Optional.of("Non-ASCII character found in email's host name: " + hostName);
+    }
+    hostName = hostnameInAsciiOptional.get();
 
     // split the hostName which is everything after the @
     String[] parts = hostName.split("\\.");
@@ -85,8 +90,12 @@ public class EmailRule implements Rule {
    idna = "Internationalized domain name" - this encode/decode cycle converts unicode into its accurate ascii
   representation as the web uses. '例え.テスト'.encode('idna') == b'xn--r8jz45g.xn--zckzah'
     */
-  private String internationalizedDomainName(String hostName) {
-    return IDN.toASCII(hostName);
+  private Optional<String> internationalizedDomainName(String data) {
+    try {
+      return Optional.of(IDN.toASCII(data));
+    } catch (IllegalArgumentException ex) {
+      return Optional.empty();
+    }
   }
 
   private Optional<String> checkBasicRegexLengthAndPeriods(String data) {
