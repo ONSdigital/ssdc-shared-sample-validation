@@ -69,7 +69,10 @@ class EmailRuleTest {
             "local-with-”-quotes@domain.com",
             "domain-starts-with-a-dot@.domain.com",
             "brackets(in)local@domain.com",
-            "incorrect-punycode@xn---something.com")
+            "incorrect-punycode@xn---something.com",
+            " nonascii@example.com ",
+            "nonascii@example.com",
+            "\u00F6nonascii@mail.com")
         .map(Arguments::of);
   };
 
