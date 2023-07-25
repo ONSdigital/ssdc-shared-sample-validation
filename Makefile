@@ -14,4 +14,5 @@ check:
 	mvn fmt:check pmd:check
 
 test:
-	mvn clean verify
+	mvn clean verify jacoco:report
+
