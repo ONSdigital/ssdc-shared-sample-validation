@@ -2,7 +2,7 @@ build:
 	mvn clean install
 
 build-no-test:
-	mvn clean install -Dmaven.test.skip=true -DdockerCompose.skip=true
+	mvn clean install -Dmaven.test.skip=true -DdockerCompose.skip=true -Djacoco.skip=true
 
 format:
 	mvn fmt:format
