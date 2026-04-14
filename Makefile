@@ -2,7 +2,7 @@
 DOCKER ?= $(shell if [ "$$(uname -m)" = "arm64" ]; then echo podman; else echo docker; fi)
 
 build:
-	mvn clean install
+	CONTAINER_CLI=$(DOCKER) mvn clean install
 
 build-no-test:
 	CONTAINER_CLI=$(DOCKER) mvn clean install -Dmaven.test.skip=true -DdockerCompose.skip=true -Djacoco.skip=true
