@@ -74,7 +74,8 @@ class EmailRuleTest {
             "nonascii@example.com",
             "\u00F6nonascii@mail.com")
         .map(Arguments::of);
-  };
+  }
+  ;
 
   @ParameterizedTest
   @MethodSource("validEmailProvider")

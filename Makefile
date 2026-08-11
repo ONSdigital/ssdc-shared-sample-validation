@@ -8,13 +8,13 @@ build-no-test:
 	CONTAINER_CLI=$(DOCKER) mvn clean install -Dmaven.test.skip=true -DdockerCompose.skip=true -Djacoco.skip=true
 
 format:
-	mvn fmt:format
+	mvn spotless:apply
 
 format-check:
-	mvn fmt:check
+	mvn spotless:check
 
 check:
-	mvn fmt:check pmd:check
+	mvn spotless:check pmd:check
 
 test:
 	CONTAINER_CLI=$(DOCKER) mvn clean verify jacoco:report
